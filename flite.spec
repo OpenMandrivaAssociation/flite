@@ -60,7 +60,8 @@ autoreconf -fvi
 %make SHFLAGS=-fPIC || %make SHFLAGS=-fPIC || make SHFLAGS=-fPIC
 
 # Build documentation
-%make -C doc %{name}.html
+# latex breakage somewhere...?
+#%make -C doc %{name}.html
 
 %install
 make install SHFLAGS=-fPIC \
@@ -71,7 +72,8 @@ make install SHFLAGS=-fPIC \
 rm %{buildroot}%{_libdir}/libflite*.a
 
 %files
-%doc ACKNOWLEDGEMENTS README doc/html README-ALSA.txt
+%doc ACKNOWLEDGEMENTS README README-ALSA.txt
+#ooc doc/html
 %{_bindir}/*
 
 %files -n %{libname}
