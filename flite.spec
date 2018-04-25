@@ -29,6 +29,7 @@ Festival for voices built using the FestVox suite of voice building tools.
 %package -n	%{libname}
 Summary:	Shared libraries for flite
 Group:		System/Libraries
+%rename %{_lib}flite1
 
 %description -n	%{libname}
 Shared libraries for Flite, a small, fast speech synthesis engine.
