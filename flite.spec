@@ -19,6 +19,7 @@ Patch11:	flite-1.4-auserver.c-Only-write-audio-data-to-a-file-in-debug-CVE-2014-
 
 BuildRequires:	texi2html
 BuildRequires:	pkgconfig(alsa)
+BuildRequires:	ed
 
 %description
 Flite (festival-lite) is a small, fast run-time speech synthesis engine
