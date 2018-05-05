@@ -4,7 +4,7 @@
 
 Name:		flite
 Version:	2.1
-Release:	1
+Release:	2
 Summary:	Small, fast speech synthesis engine (text-to-speech)
 Group:		Sound
 License:	MIT
