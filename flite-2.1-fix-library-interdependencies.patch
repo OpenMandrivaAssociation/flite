@@ -1,0 +1,43 @@
+diff -up flite-2.1-release/config/common_make_rules.3~ flite-2.1-release/config/common_make_rules
+--- flite-2.1-release/config/common_make_rules.3~	2019-02-06 23:24:55.111891638 +0100
++++ flite-2.1-release/config/common_make_rules	2019-02-06 23:31:12.615053501 +0100
+@@ -117,8 +117,19 @@ $(OBJDIR)/.build_so: $(FULLSHOBJS)
+ 	@ $(RANLIB) $(LIBDIR)/lib$(LIBNAME).shared.a
+ 	@ touch $(OBJDIR)/.build_so
+ 
+-# Used in the lib/ directory and in building new voices
+-$(LIBDIR)/%.so: $(LIBDIR)/%.shared.a
++# Done separately to prevent circular dependencies
++$(LIBDIR)/libflite_usenglish.so: $(LIBDIR)/libflite_usenglish.shared.a
++	@ echo making $@
++	@ rm -rf shared_os && mkdir shared_os
++	@ rm -f $@ $@.${PROJECT_VERSION} $@.${PROJECT_SHLIB_VERSION} 
++	@ (cd shared_os && ar x ../$<)
++	@ (cd shared_os && $(CC) ${LDFLAGS} -shared -Wl,-soname,`basename $@`.${PROJECT_SHLIB_VERSION} -o ../$@.${PROJECT_VERSION} *.os $(LDLIBS))
++	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_VERSION}` `basename $@.${PROJECT_SHLIB_VERSION}` )
++	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_SHLIB_VERSION}` `basename $@` )
++	@ rm -rf shared_os
++
++# Done separately to prevent circular dependencies
++$(LIBDIR)/libflite_cmulex.so: $(LIBDIR)/libflite_cmulex.shared.a
+ 	@ echo making $@
+ 	@ rm -rf shared_os && mkdir shared_os
+ 	@ rm -f $@ $@.${PROJECT_VERSION} $@.${PROJECT_SHLIB_VERSION} 
+@@ -127,6 +138,17 @@ $(LIBDIR)/%.so: $(LIBDIR)/%.shared.a
+ 	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_VERSION}` `basename $@.${PROJECT_SHLIB_VERSION}` )
+ 	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_SHLIB_VERSION}` `basename $@` )
+ 	@ rm -rf shared_os
++
++# Used in the lib/ directory and in building new voices
++$(LIBDIR)/%.so: $(LIBDIR)/%.shared.a $(LIBDIR)/libflite_usenglish.so $(LIBDIR)/libflite_cmulex.so
++	@ echo making $@
++	@ rm -rf shared_os && mkdir shared_os
++	@ rm -f $@ $@.${PROJECT_VERSION} $@.${PROJECT_SHLIB_VERSION} 
++	@ (cd shared_os && ar x ../$<)
++	(echo $@ |grep -q _us_ && export EXTRA_LIBS=../$(TOP)/build/$(TARGET_PLATFORM)/lib/libflite_usenglish.so; echo $@ |grep -q cmu_ && export EXTRA_LIBS="$$EXTRA_LIBS ../$(TOP)/build/$(TARGET_PLATFORM)/lib/libflite_cmulex.so"; cd shared_os && $(CC) ${LDFLAGS} -shared -Wl,-soname,`basename $@`.${PROJECT_SHLIB_VERSION} -o ../$@.${PROJECT_VERSION} *.os $(LDLIBS) $$EXTRA_LIBS)
++	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_VERSION}` `basename $@.${PROJECT_SHLIB_VERSION}` )
++	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_SHLIB_VERSION}` `basename $@` )
++	@ rm -rf shared_os
+ 
+ $(OBJDIR)/.make_build_dirs:
+ 	@ echo making in $(DIRNAME) ...

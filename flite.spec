@@ -4,7 +4,7 @@
 
 Name:		flite
 Version:	2.1
-Release:	4
+Release:	5
 Summary:	Small, fast speech synthesis engine (text-to-speech)
 Group:		Sound
 License:	MIT
@@ -13,6 +13,7 @@ Source0:	http://festvox.org/flite/packed/flite-%{version}/%{name}-%{version}-rel
 Source1:	README-ALSA.txt
 Patch0:		flite-1.4-mga-texi2html_Makefile.patch
 Patch1:		flite-ldflags.patch
+Patch2:		flite-2.1-fix-library-interdependencies.patch
 # from Fedora, fixes CVE-2014-0027, insecure temporary file use in auserver.c
 Patch11:	flite-1.4-auserver.c-Only-write-audio-data-to-a-file-in-debug-CVE-2014-0027.patch
 BuildRequires:	texi2html
