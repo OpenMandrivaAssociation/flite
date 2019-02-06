@@ -71,7 +71,21 @@ make install SHFLAGS=-fPIC \
 
 rm %{buildroot}%{_libdir}/libflite*.a
 chrpath -d %{buildroot}%{_bindir}/*
-sed -e 's, at libdir at ,%{_libdir},' -e 's, at version at ,%{version},' < flite.pc.in > %{buildroot}%{_prefix}/lib/pkgconfig/flite.pc
+
+mkdir -p %{buildroot}%{_prefix}/lib/pkgconfig
+cat > %{buildroot}%{_prefix}/lib/pkgconfig/flite.pc << EOF
+prefix=%{_prefix}
+exec_prefix=%{_prefix}
+libdir=%{_libdir}
+includedir=%{_includedir}
+version=%{version}
+
+Name: flite
+Description: small, fast speech synthesis engine
+Version: ${version}
+Libs: -lflite
+Cflags:
+EOF
 
 %files
 %doc ACKNOWLEDGEMENTS README-ALSA.txt
