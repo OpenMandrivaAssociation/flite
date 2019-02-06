@@ -1,0 +1,148 @@
+diff -Nru flite-2.0.0/config/common_make_rules flite-2.0.0-fix2/config/common_make_rules
+--- flite-2.0.0/config/common_make_rules	2015-06-23 21:03:11.000000000 +0200
++++ flite-2.0.0-fix2/config/common_make_rules	2016-05-21 13:00:52.261496432 +0200
+@@ -68,7 +68,17 @@
+ 
+ FLITELIBS = $(BUILDDIR)/lib/libflite.a
+ FLITELIBFLAGS = -L$(BUILDDIR)/lib -lflite 
+-LDFLAGS += -lm $(AUDIOLIBS) $(OTHERLIBS)
++LDFLAGS += -lm $(OTHERLIBS)
++
++libflite_LDLIBS = $(AUDIOLIBS) -lm
++libflite_cmulex_LDLIBS = -lflite
++libflite_usenglish_LDLIBS = -lflite
++libflite_cmu_us_awb_LDLIBS = -lflite_cmulex -lflite_usenglish -lflite
++libflite_cmu_us_kal_LDLIBS = -lflite_cmulex -lflite_usenglish -lflite
++libflite_cmu_us_kal16_LDLIBS = -lflite_cmulex -lflite_usenglish -lflite
++libflite_cmu_us_rms_LDLIBS = -lflite_cmulex -lflite_usenglish -lflite
++libflite_cmu_us_slt_LDLIBS = -lflite_cmulex -lflite_usenglish -lflite
++libflite_cmu_time_awb_LDLIBS = -lflite -lflite_cmulex -lflite_usenglish -lflite
+ 
+ FULLOBJS = $(OBJS:%=$(OBJDIR)/%)
+ ifdef SHFLAGS
+@@ -123,7 +133,7 @@
+ 	@ rm -rf shared_os && mkdir shared_os
+ 	@ rm -f $@ $@.${PROJECT_VERSION} $@.${PROJECT_SHLIB_VERSION} 
+ 	@ (cd shared_os && ar x ../$<)
+-	@ (cd shared_os && $(CC) -shared -Wl,-soname,`basename $@`.${PROJECT_SHLIB_VERSION} -o ../$@.${PROJECT_VERSION} *.os)
++	@ (cd shared_os && $(CC) -shared -Wl,-soname,`basename $@`.${PROJECT_SHLIB_VERSION} -o ../$@.${PROJECT_VERSION} *.os $(LDFLAGS) -L../$(dir $@) $($(patsubst %.so,%_LDLIBS,$(notdir $@))))
+ 	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_VERSION}` `basename $@.${PROJECT_SHLIB_VERSION}` )
+ 	@ (cd $(LIBDIR) && ln -s `basename $@.${PROJECT_SHLIB_VERSION}` `basename $@` )
+ 	@ rm -rf shared_os
+diff -Nru flite-2.0.0/main/Makefile flite-2.0.0-fix2/main/Makefile
+--- flite-2.0.0/main/Makefile	2015-06-23 21:03:11.000000000 +0200
++++ flite-2.0.0-fix2/main/Makefile	2016-05-21 13:22:10.751761994 +0200
+@@ -53,7 +53,7 @@
+ VOICES=$(VOXES)
+ VOICELIBS=$(VOICES:%=flite_%)
+ 
+-flite_LIBS = $(VOICELIBS) $(LANGS:%=flite_%) $(LEXES:%=flite_%) flite
++flite_LIBS = flite $(LEXES:%=flite_%) $(LANGS:%=flite_%) $(VOICELIBS)
+ 
+ flite_LIBS_flags = -L$(LIBDIR) $(flite_LIBS:%=-l%)
+ flite_LIBS_deps = $(flite_LIBS:%=$(LIBDIR)/lib%.a)
+@@ -78,7 +78,6 @@
+               flite_voice_list.c
+ 
+ ifdef SHFLAGS
+-flite_LIBS_flags += -Wl,-rpath $(LIBDIR) 
+ shared_libs: $(SHAREDLIBS)
+ else
+ shared_libs: nothing
+@@ -95,22 +94,22 @@
+ 	$(TOP)/tools/make_voice_list $(VOICES)
+ 	rm -f flite_voice_list.o
+ 	$(MAKE) flite_voice_list.o
+-	$(CC) $(CFLAGS) -o $@ flite_main.o flite_voice_list.o flite_lang_list.o $(flite_LIBS_flags) $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ flite_main.o flite_voice_list.o flite_lang_list.o $(LDFLAGS) $(flite_LIBS_flags)
+ 
+ $(BINDIR)/flitevox_info$(EXEEXT): flitevox_info_main.o flite_lang_list $(flite_LIBS_deps)
+ 	$(TOP)/tools/make_voice_list $(VOICES)
+ 	rm -f flite_voice_list.o
+ 	$(MAKE) flite_voice_list.o
+-	$(CC) $(CFLAGS) -o $@ flitevox_info_main.o flite_voice_list.o flite_lang_list.o $(flite_LIBS_flags) $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ flitevox_info_main.o flite_voice_list.o flite_lang_list.o  $(LDFLAGS) $(flite_LIBS_flags)
+ 
+ $(BINDIR)/flite_time$(EXEEXT): flite_time_main.o $(flite_time_LIBS_deps)
+-	$(CC) $(CFLAGS) -o $@ flite_time_main.o $(flite_time_LIBS_flags) $(FLITELIBFLAGS) $(LDFLAGS) 
++	$(CC) $(CFLAGS) -o $@ flite_time_main.o $(flite_time_LIBS_flags) $(LDFLAGS) $(FLITELIBFLAGS) 
+ 
+ $(BINDIR)/t2p$(EXEEXT): t2p_main.o $(flite_LIBS_deps)
+-	$(CC) $(CFLAGS) -o $@ t2p_main.o $(flite_LIBS_flags) $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ t2p_main.o $(LDFLAGS) $(flite_LIBS_flags)
+ 
+ $(BINDIR)/compile_regexes$(EXEEXT): compile_regexes.o $(FLITELIBS)
+-	$(CC) $(CFLAGS) -o $@ compile_regexes.o $(FLITELIBFLAGS) $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ compile_regexes.o $(LDFLAGS) $(FLITELIBFLAGS)
+ 
+ each:
+ 	@ for i in $(VOICES) ; \
+@@ -122,7 +121,7 @@
+ 	$(TOP)/tools/make_voice_list $(VOICE)
+ 	rm -f flite_voice_list.o
+ 	$(MAKE) flite_voice_list.o
+-	$(CC) $(CFLAGS) -o $@ flite_main.o flite_voice_list.o flite_lang_list.o $(flite_LIBS_flags) $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ flite_main.o flite_voice_list.o flite_lang_list.o $(LDFLAGS) $(flite_LIBS_flags)
+ 
+ install:
+ #       The basic binaries
+diff -Nru flite-2.0.0/Makefile flite-2.0.0-fix2/Makefile
+--- flite-2.0.0/Makefile	2015-06-23 21:03:11.000000000 +0200
++++ flite-2.0.0-fix2/Makefile	2016-05-21 12:58:41.173339963 +0200
+@@ -46,7 +46,7 @@
+ BUILD_DIRS = include src lang doc
+ ALL_DIRS=config $(BUILD_DIRS) testsuite \
+          wince windows android \
+-         tools main 
++         main tools 
+ CONFIG=configure configure.in config.sub config.guess \
+        missing install-sh mkinstalldirs
+ WINDOWS = Exports.def flite.sln fliteDll.vcproj
+@@ -55,7 +55,7 @@
+                 config.cache config.log config.status \
+ 		config/config config/system.mak FileList
+ 
+-HOST_ONLY_DIRS = tools main
++HOST_ONLY_DIRS = main tools
+ ALL = $(BUILD_DIRS)
+ 
+ config_dummy := $(shell test -f config/config || ( echo '*** '; echo '*** Making default config file ***'; echo '*** '; ./configure; )  >&2)
+diff -Nru flite-2.0.0/testsuite/Makefile flite-2.0.0-fix2/testsuite/Makefile
+--- flite-2.0.0/testsuite/Makefile	2015-06-23 21:03:11.000000000 +0200
++++ flite-2.0.0-fix2/testsuite/Makefile	2016-05-21 13:09:14.224540014 +0200
+@@ -74,7 +74,7 @@
+ $(MAIN_O) : %_main.o : %_main.c
+ 	$(CC) $(CFLAGS) -o $@ $< 
+ $(ALL) : %$(EXEEXT) : %_main.o $(FLITELIBS)
+-	$(CC) $(CFLAGS) -o $@ $@_main.o $($(@:=_LIBS)) $(FLITELIBFLAGS) $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ $@_main.o $($(@:=_LIBS)) $(LDFLAGS) $(FLITELIBFLAGS)
+ 
+ multi_thread_test: multi_thread_main.c
+ 	gcc -fopenmp -o multi_thread_test multi_thread_main.c \
+diff -Nru flite-2.0.0/tools/Makefile flite-2.0.0-fix2/tools/Makefile
+--- flite-2.0.0/tools/Makefile	2015-06-23 21:03:11.000000000 +0200
++++ flite-2.0.0-fix2/tools/Makefile	2016-05-21 13:10:13.317692332 +0200
+@@ -67,9 +67,9 @@
+ LOCAL_CLEAN = $(BINDIR)/find_sts $(BINDIR)/flite_sort $(TOP)/bin
+ 
+ $(BINDIR)/find_sts: find_sts_main.o $(FLITELIBS) 
+-	$(CC) $(CFLAGS) -o $@ find_sts_main.o $(FLITELIBFLAGS) $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ find_sts_main.o $(LDFLAGS) $(FLITELIBFLAGS)
+ $(BINDIR)/flite_sort: flite_sort_main.o $(FLITELIBS)
+-	$(CC) $(CFLAGS) -o $@ flite_sort_main.o $(FLITELIBFLAGS) $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ flite_sort_main.o $(LDFLAGS) $(FLITELIBFLAGS)
+ makescripts:
+ 	@ cp -p $(SCRIPTS) $(TOP)/bin
+ 
+diff -Nru flite-2.0.0/tools/Makefile.flite flite-2.0.0-fix2/tools/Makefile.flite
+--- flite-2.0.0/tools/Makefile.flite	2015-06-23 21:03:11.000000000 +0200
++++ flite-2.0.0-fix2/tools/Makefile.flite	2016-05-21 13:11:17.693862826 +0200
+@@ -101,7 +101,7 @@
+ 	$(CC) $(CFLAGS) -I. -I$(FLITEDIR)/include -c -o $@ $<
+ 
+ flite_$(VOICENAME): flite_main.o flite_voice_list.o flite_lang_list.o $(FLITELIBS) lib$(VOICENAME).a
+-	$(CC) $(CFLAGS) -o $@ flite_main.o flite_voice_list.o flite_lang_list.o $(LOCAL_LIBS)  $(LOCAL_LANGLEX_LIBS) $(FLITELIBFLAGS) $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ flite_main.o flite_voice_list.o flite_lang_list.o $(LDFLAGS) $(LOCAL_LIBS)  $(LOCAL_LANGLEX_LIBS) $(FLITELIBFLAGS)
+ 
+ lib$(VOICENAME).a: $(OBJS)
+ 	@ $(AR) cruv lib$(VOICENAME).a $(OBJS)
