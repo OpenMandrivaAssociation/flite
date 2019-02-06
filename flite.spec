@@ -4,7 +4,7 @@
 
 Name:		flite
 Version:	2.1
-Release:	3
+Release:	4
 Summary:	Small, fast speech synthesis engine (text-to-speech)
 Group:		Sound
 License:	MIT
@@ -13,10 +13,12 @@ Source0:	http://festvox.org/flite/packed/flite-%{version}/%{name}-%{version}-rel
 Source1:	README-ALSA.txt
 Patch0:		flite-1.4-mga-texi2html_Makefile.patch
 Patch1:		flite-2.1-compile.patch
-
+# Originally from PLD and Debian. Combined, modified and added some chunks to fulfill our needs
+Patch10:		flite-2.0.0-linking.patch
 # from Fedora, fixes CVE-2014-0027, insecure temporary file use in auserver.c
 Patch11:	flite-1.4-auserver.c-Only-write-audio-data-to-a-file-in-debug-CVE-2014-0027.patch
-
+# Fixes detection of Alsa ver. 1.1.0
+Patch12:        flite-1.4-mga-new-alsa.patch
 BuildRequires:	texi2html
 BuildRequires:	pkgconfig(alsa)
 BuildRequires:	ed
@@ -45,8 +47,7 @@ Provides:	%{name}-devel = %{EVRD}
 Development files for Flite, a small, fast speech synthesis engine.
 
 %prep
-%setup -q -n %{name}-%{version}-release
-%apply_patches
+%autosetup -n %{name}-%{version}-release -p1
 
 cp -p %{SOURCE1} .
 autoreconf -fvi
@@ -57,7 +58,7 @@ autoreconf -fvi
 		--with-vox \
 		--with-lang \
 		--with-lex
-%make SHFLAGS="-fPIC" LDFLAGS="%{optflags} -lm"
+%make_build SHFLAGS="-fPIC" LDFLAGS="%{optflags} -lm"
 
 # Build documentation
 # latex breakage somewhere...?
