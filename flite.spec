@@ -12,16 +12,13 @@ URL:		http://www.speech.cs.cmu.edu/flite/
 Source0:	http://festvox.org/flite/packed/flite-%{version}/%{name}-%{version}-release.tar.bz2
 Source1:	README-ALSA.txt
 Patch0:		flite-1.4-mga-texi2html_Makefile.patch
-Patch1:		flite-2.1-compile.patch
-# Originally from PLD and Debian. Combined, modified and added some chunks to fulfill our needs
-Patch10:		flite-2.0.0-linking.patch
+Patch1:		flite-ldflags.patch
 # from Fedora, fixes CVE-2014-0027, insecure temporary file use in auserver.c
 Patch11:	flite-1.4-auserver.c-Only-write-audio-data-to-a-file-in-debug-CVE-2014-0027.patch
-# Fixes detection of Alsa ver. 1.1.0
-Patch12:        flite-1.4-mga-new-alsa.patch
 BuildRequires:	texi2html
 BuildRequires:	pkgconfig(alsa)
 BuildRequires:	ed
+BuildRequires:	chrpath
 
 %description
 Flite (festival-lite) is a small, fast run-time speech synthesis engine
@@ -55,7 +52,7 @@ autoreconf -fvi
 %build
 %configure	--with-shared \
 		--with-audio=alsa \
-		--with-vox \
+		--with-vox=cmu_us_kal16 \
 		--with-lang \
 		--with-lex
 %make_build SHFLAGS="-fPIC" LDFLAGS="%{optflags} -lm"
@@ -72,9 +69,10 @@ make install SHFLAGS=-fPIC \
 
 rm %{buildroot}%{_libdir}/libflite*.a
 
+chrpath -d %{_buildroot}%{_bindir}/*
+  
 %files
 %doc ACKNOWLEDGEMENTS README-ALSA.txt
-#ooc doc/html
 %{_bindir}/*
 
 %files -n %{libname}
