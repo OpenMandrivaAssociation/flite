@@ -68,9 +68,9 @@ make install SHFLAGS=-fPIC \
 	INSTALLINCDIR=%{buildroot}%{_includedir}/%{name}
 
 rm %{buildroot}%{_libdir}/libflite*.a
-
 chrpath -d %{_buildroot}%{_bindir}/*
-  
+sed -e 's, at libdir at ,%{_libdir},' -e 's, at version at ,%{version},' < flite.pc.in > %{buildroot}%{_prefix}/lib/pkgconfig/flite.pc
+
 %files
 %doc ACKNOWLEDGEMENTS README-ALSA.txt
 %{_bindir}/*
@@ -82,3 +82,4 @@ chrpath -d %{_buildroot}%{_bindir}/*
 %files -n %{devname}
 %{_libdir}/lib%{name}*.so
 %{_includedir}/%{name}/
+%{_prefix}/lib/pkgconfig/flite.pc
