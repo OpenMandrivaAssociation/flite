@@ -70,7 +70,7 @@ make install SHFLAGS=-fPIC \
 	INSTALLINCDIR=%{buildroot}%{_includedir}/%{name}
 
 rm %{buildroot}%{_libdir}/libflite*.a
-chrpath -d %{_buildroot}%{_bindir}/*
+chrpath -d %{buildroot}%{_bindir}/*
 sed -e 's, at libdir at ,%{_libdir},' -e 's, at version at ,%{version},' < flite.pc.in > %{buildroot}%{_prefix}/lib/pkgconfig/flite.pc
 
 %files
