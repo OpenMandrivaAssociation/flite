@@ -1,5 +1,5 @@
-%define	major	2.1
-%define libname	%mklibname %{name} %{major}
+%define major 2.1
+%define libname %mklibname %{name} %{major}
 %define devname %mklibname %{name} -d
 
 Name:		flite
@@ -26,21 +26,21 @@ developed at CMU and primarily designed for small embedded machines and/or
 large servers. Flite is designed as an alternative synthesis engine to
 Festival for voices built using the FestVox suite of voice building tools.
 
-%package -n	%{libname}
+%package -n %{libname}
 Summary:	Shared libraries for flite
 Group:		System/Libraries
 %rename %{_lib}flite1
 
-%description -n	%{libname}
+%description -n %{libname}
 Shared libraries for Flite, a small, fast speech synthesis engine.
 
-%package -n	%{devname}
+%package -n %{devname}
 Summary:	Development files for flite
 Group:		Development/C
 Requires:	%{libname} = %{EVRD}
 Provides:	%{name}-devel = %{EVRD}
 
-%description -n	%{devname}
+%description -n %{devname}
 Development files for Flite, a small, fast speech synthesis engine.
 
 %prep
@@ -50,11 +50,13 @@ cp -p %{SOURCE1} .
 autoreconf -fvi
 
 %build
-%configure	--with-shared \
-		--with-audio=alsa \
-		--with-vox=cmu_us_kal16 \
-		--with-lang \
-		--with-lex
+%configure \
+	--with-shared \
+	--with-audio=alsa \
+	--with-vox=cmu_us_kal16 \
+	--with-lang \
+	--with-lex
+
 %make_build SHFLAGS="-fPIC" LDFLAGS="%{optflags} -lm"
 
 # Build documentation
