@@ -8,7 +8,7 @@ Release:	6
 Summary:	Small, fast speech synthesis engine (text-to-speech)
 Group:		Sound
 License:	MIT
-URL:		http://www.speech.cs.cmu.edu/flite/
+URL:		https://www.speech.cs.cmu.edu/flite/
 Source0:	http://festvox.org/flite/packed/flite-%{version}/%{name}-%{version}-release.tar.bz2
 Source1:	README-ALSA.txt
 Patch0:		flite-1.4-mga-texi2html_Makefile.patch
