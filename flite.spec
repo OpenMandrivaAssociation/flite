@@ -1,15 +1,15 @@
-%define major 2.1
+%define major 2.2
 %define libname %mklibname %{name} %{major}
 %define devname %mklibname %{name} -d
 
 Name:		flite
-Version:	2.1
-Release:	6
+Version:	2.2
+Release:	1
 Summary:	Small, fast speech synthesis engine (text-to-speech)
 Group:		Sound
 License:	MIT
 URL:		https://www.speech.cs.cmu.edu/flite/
-Source0:	http://festvox.org/flite/packed/flite-%{version}/%{name}-%{version}-release.tar.bz2
+Source0:	https://github.com/festvox/flite/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:	README-ALSA.txt
 Patch0:		flite-1.4-mga-texi2html_Makefile.patch
 Patch1:		flite-ldflags.patch
