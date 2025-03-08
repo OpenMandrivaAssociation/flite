@@ -45,7 +45,7 @@ Provides:	%{name}-devel = %{EVRD}
 Development files for Flite, a small, fast speech synthesis engine.
 
 %prep
-%autosetup -n %{name}-%{version}-release -p1
+%autosetup -n %{name}-%{version} -p1
 
 cp -p %{SOURCE1} .
 autoreconf -fvi
