@@ -16,6 +16,7 @@ Source1:	README-ALSA.txt
 #Patch2:		flite-2.1-fix-library-interdependencies.patch
 # from Fedora, fixes CVE-2014-0027, insecure temporary file use in auserver.c
 #Patch11:	flite-1.4-auserver.c-Only-write-audio-data-to-a-file-in-debug-CVE-2014-0027.patch
+Patch0:		flite-2.2-texinfo-7.0.patch
 BuildRequires:	texi2html
 BuildRequires:	pkgconfig(alsa)
 BuildRequires:	ed
