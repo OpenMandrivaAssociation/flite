@@ -1,3 +1,5 @@
+%define _disable_lto 1
+
 %define major 2.2
 %define libname %mklibname %{name} %{major}
 %define devname %mklibname %{name} -d
@@ -65,7 +67,7 @@ export CXX=g++
 	--with-lang \
 	--with-lex
 
-%make_build SHFLAGS="-fPIC" LDFLAGS="%{optflags} -lm"
+%make_build SHFLAGS="-fPIC" LDFLAGS="%{optflags} -lm" -j1
 
 # Build documentation
 # latex breakage somewhere...?
