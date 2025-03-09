@@ -19,6 +19,7 @@ Source1:	README-ALSA.txt
 Patch0:		flite-2.2-texinfo-7.0.patch
 BuildRequires:	texi2html
 BuildRequires:	pkgconfig(alsa)
+BuildRequires:	pkgconfig(libpulse)
 BuildRequires:	ed
 BuildRequires:	chrpath
 BuildRequires:  texinfo
@@ -59,6 +60,7 @@ export CXX=g++
 %configure \
 	--with-shared \
 	--with-audio=alsa \
+ 	--with-audio=pulseaudio \
 	--with-vox=cmu_us_kal16 \
 	--with-lang \
 	--with-lex
