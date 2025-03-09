@@ -53,6 +53,9 @@ cp -p %{SOURCE1} .
 autoreconf -fvi
 
 %build
+export CC=gcc
+export CXX=g++
+
 %configure \
 	--with-shared \
 	--with-audio=alsa \
