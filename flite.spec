@@ -21,6 +21,7 @@ BuildRequires:	texi2html
 BuildRequires:	pkgconfig(alsa)
 BuildRequires:	ed
 BuildRequires:	chrpath
+BuildRequires:  texinfo
 
 %description
 Flite (festival-lite) is a small, fast run-time speech synthesis engine
