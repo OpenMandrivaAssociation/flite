@@ -67,7 +67,7 @@ export CXX=g++
 	--with-lang \
 	--with-lex
 
-%make_build SHFLAGS="-fPIC" LDFLAGS="%{optflags} -lm" -j1
+%make_build SHFLAGS="-fPIC" -j1
 
 # Build documentation
 # latex breakage somewhere...?
