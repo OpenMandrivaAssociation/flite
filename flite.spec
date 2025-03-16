@@ -1,12 +1,13 @@
 %define _disable_lto 1
 
 %define major 2.2
-%define libname %mklibname %{name} %{major}
+%define oldlibname %mklibname %{name} 2.1
+%define libname %mklibname %{name}
 %define devname %mklibname %{name} -d
 
 Name:		flite
 Version:	2.2
-Release:	1
+Release:	2
 Summary:	Small, fast speech synthesis engine (text-to-speech)
 Group:		Sound
 License:	MIT
@@ -36,6 +37,7 @@ Festival for voices built using the FestVox suite of voice building tools.
 Summary:	Shared libraries for flite
 Group:		System/Libraries
 %rename %{_lib}flite1
+%rename %{oldlibname}
 
 %description -n %{libname}
 Shared libraries for Flite, a small, fast speech synthesis engine.
@@ -56,6 +58,10 @@ cp -p %{SOURCE1} .
 autoreconf -fvi
 
 %build
+# FIXME
+# building with clang is broken by _FORTIFY_SOURCE defines combined with headers
+# /usr/include/bits/stdlib.h:38:54: error: pass_object_size attribute only applies to constant pointer arguments
+#   38 |                  __fortify_clang_overload_arg (char *, __restrict, __resolved)))
 export CC=gcc
 export CXX=g++
 
